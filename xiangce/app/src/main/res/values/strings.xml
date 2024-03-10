@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">xiangce</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="sy">首页</string>
+    <string name="wd">我的</string>
+    <string name="title_text">智慧云相册</string>
+    <string name="username_hint">请输入用户名</string>
+    <string name="password_hint">请输入密码</string>
+    <string name="submit_text">登录</string>
+    <item name="ykj_imgType" type="id"/>
+    <item name="ykj_imgPosiotn" type="id"/>
+    <item name="ykj_imgId" type="id"/>
+
+    <item name="sy_item_img_path" type="id"/>
+    <item name="sy_item_cb_position" type="id"/>
+    <item name="sy_item_cb" type="id"/>
+    <item name="sy_item_img" type="id"/>
+</resources>
