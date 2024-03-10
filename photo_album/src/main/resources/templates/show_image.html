@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+		<script src="js/jquery-1.10.2.min.js" charset="utf-8"></script>
+		<link rel="stylesheet" href="layui/css/layui.css" media="all">
+		<script src="layui/layui.js" charset="utf-8"></script>
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<style type="text/css">
+			.mycolumn {
+				/* background-color: #00BCD4; */
+				margin: 10px 10px;
+				width: 18%;
+				height: 150px;
+			}
+
+			.div_dir {
+				width: 100%;
+				text-align: center;
+				height: 140px;
+				margin: 0 auto;
+
+				/* background-color: palevioletred; */
+			}
+
+			.div_dir img {
+				width: 80%;
+				height: 125px;
+				padding: 10px 10px;
+				border: solid #ddd 1px;
+				cursor: pointer;
+				object-fit: cover;
+			}
+
+			.div_dir span {
+				display: block;
+				padding: 0 10px;
+				width: 90%;
+				height: 18px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				padding-top: 1px;
+			}
+
+			.div_select {
+				width: 14px;
+				height: 14px;
+				position: absolute;
+				left: 12px;
+				top: 0px;
+				cursor: pointer;
+				border: solid 1.5px #888;
+			}
+
+			.div_btn {
+				padding-left: 20px;
+			}
+
+			.div_fenye {
+				/* position: fixed;
+				left: 20px;
+				bottom: -18px; */
+				float: right;
+				margin-right: 20px;
+			}
+
+			#div_video {
+				text-align: center;
+				padding: 50px 0;
+				background: #444;
+				display: none;
+			}
+
+			#div_video video {
+				object-fit: cover;
+			}
+			#div_position{
+				width: 100%;
+			}
+			#div_position .p1{
+				height: 54.6px;
+				float: left;
+				text-align: justify;
+				width: 60%;
+				overflow: hidden;
+				text-overflow:ellipsis;
+				white-space:nowrap;
+			}
+			.p1>li{
+				display: inline-block;
+				position: relative;
+				left: 0;
+				top: 20px;
+			}
+			#div_position .p1_a{
+				text-decoration: none;
+				color: #1e9fff;
+				margin-left: 5px;
+				margin-right: 5px;
+			}
+		</style>
+		<style>
+		  .tempDiv{
+			  border:1px dashed blue;
+			  background:#5a72f8;
+			  position:absolute;
+			  width:0;
+			  height:0;
+			  filter:alpha(opacity=10);
+			  opacity:0.1;
+		  }
+		</style>
+	</head>
+	<body>
+		<!-- 视频播放 -->
+		<div id="div_video">
+			<video width="90%" height="80%" controls="controls" src="">
+				当前浏览器不支持 video直接播放，点击这里下载视频： <a id="video_a" href="">下载视频</a>
+			</video>
+		</div>
+		<div id="div_position">
+			<div class="p1" >
+				<li v-for="p,index in position" :key="index">
+					<a @click="tiaozhuan(index)" class="p1_a" href="javascript:void(0);">{{p.name}}</a>
+					<span class="layui-badge-dot layui-bg-black"></span>
+				</li>
+			</div>
+			<div class="div_fenye" id="demo1"></div>
+			<hr class="layui-border-green">
+		</div>
+		
+		<div class="div_btn">
+			<button type="button" class="layui-btn" id="insNewFolder">新建文件夹</button>
+			<button type="button" class="layui-btn" id="backFuFolder">返回上一级</button>
+			<!-- 在当前文件夹直接添加文件夹 -->
+			<button type="button" id="btn_del" class="layui-btn  layui-btn-danger">
+				<i class="layui-icon">&#xe640;</i>删除
+			</button>
+		</div>
+
+		<div id="content1" class="layui-row">
+			<!-- 新建文件夹  开始 -->
+			<div class="layui-col-sm3 mycolumn" v-show="isShow">
+				<div class="grid-demo grid-demo-bg1">
+					<div class="div_dir">
+						<div class="div_select">
+						</div>
+						<i title="点击进入文件夹" style="font-size: 125px;cursor: pointer;" class="layui-icon layui-icon-file-b"></i>
+						<span v-show="isShowInput" v-text="folderName"></span>
+						<input id="input_insf" v-show="!isShowInput" value="新建文件夹" autofocus="autofocus" style="padding-left: 5px;" @blur="ins_input_blur"
+						 type="text" v-model="folderName" />
+					</div>
+				</div>
+			</div>
+			<!-- 新建文件夹  结束 -->
+
+			<div id="photo_div" class="layui-col-sm3 mycolumn" v-for="f,index in data" :key="index">
+				<div class="grid-demo grid-demo-bg1">
+					<div class="div_dir">
+						<div class="div_select" @click="div_select_click(index,f)">
+							<i v-show="complexSelect[index]" class="layui-icon">&#xe605;</i>
+						</div>
+						<!-- <i @click="fclick(f)" title="点击进入相册" v-if="f.isimg == 2" style="font-size: 120px;cursor: pointer;" class="layui-icon layui-icon-file-b"></i> -->
+						<img draggable="false" class="be_select_ele" @click="fclick(f)" title="点击进入相册" v-if="f.isimg == 2" :src="f.realname === f.imgname? '/images/folder.jpg':('/gsi?imgName=' + f.realname)">
+						<i @click="playVideo(f)" title="点击播放" v-else-if="f.isimg == 0" style="font-size: 100px;cursor: pointer;" class="layui-icon layui-icon-play be_select_ele"></i>
+						<img draggable="false" class="be_select_ele" @click="iclick(index)" :title="'点击查看图片' + f.uploadtime.substring(0,10)" v-else-if="f.isimg == 1" :src="'/gsi?imgName=' + f.realname">
+
+						<span @dblclick="updName(f,index, $event)" v-show="showFolderName[index]" :title="f.imgname">{{f.imgname}}</span>
+						<input v-show="!showFolderName[index]" v-model="updFolderName[index]" autofocus="autofocus" style="padding-left: 5px;" 
+						 @blur="upd_input_blur(f,index)" type="text"/>
+					</div>
+				</div>
+			</div>
+
+			<!-- <div class="layui-col-sm3 mycolumn">
+				<div class="grid-demo grid-demo-bg1">
+					<div class="div_dir">
+						<div class="div_select">
+			
+						</div>
+						<img src="img/1.jpg"> 
+						<i style="font-size: 125px;cursor: pointer;" class="layui-icon layui-icon-file-b"></i>
+						<span>asdfgjkalj.jpg</span>
+					</div>
+				</div>
+			</div> -->
+		</div>
+		
+		<script type="text/javascript">
+			//页面初始化数据
+			window.mydata = {
+				position: [{
+					"name": "根目录",
+					"id": 0,
+					"fid": 0
+				}]
+			};
+			window.mydata.pageSize = 15;
+			window.mydata.pageNum = 1;
+		</script>
+		
+		<script type="text/javascript">
+			//删除按钮点击事件
+			$(function() {
+				$("#btn_del").click(function() {
+					// var c =
+					layer.confirm("确定删除？", {
+						btn: ["确定", "取消"]
+					}, function() {
+						layer.closeAll('dialog');
+						// layer.msg("确定")
+						var indexs = vue.complexSelect;
+						var flag = true; //未选择
+						for (var i = 0; i < indexs.length; i++) {
+							if (indexs[i] === true) {
+								flag = false;
+								//进行删除操作
+								if (vue.data[i].isimg == 2) {
+									//文件夹删除
+									$.post("/df", {
+										"fid": vue.data[i].id
+									})
+								} else {
+									//文件删除
+									$.post("/di", {
+										"id": vue.data[i].id
+									})
+								}
+							}
+						}
+						//未选择 --进行提示
+						if (flag) {
+							layer.msg("未选择", {
+								time: 500
+							});
+						} else {
+							//刷新页面数据
+							setTimeout(function(){
+								$.post("/gij", getFenyeData(), function(resp) {
+									vue.data = resp;
+									// vue.$forceUpdate();
+									clearComplexSelect();
+									flushFenye();
+								})
+							},1000)
+							
+						}
+						
+					}, function() {
+						// layer.msg("取消")
+					})
+
+				});
+			})
+
+			function imgTanchu() {
+				//相册层
+				$.getJSON('test/photos.json?v=' + new Date, function(json) {
+					layer.photos({
+						photos: json //格式见API文档手册页
+							,
+						anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+					});
+				});
+			}
+		</script>
+		<script type="text/javascript">
+			//获取当前分页数据  需要上传的参数
+			function getFenyeData() {
+				return {
+					fid: window.mydata.position[window.mydata.position.length - 1].id,
+					pageSize: window.mydata.pageSize,
+					pageNum: window.mydata.pageNum
+				}
+			}
+			//分页
+			function flushFenye() {
+				var data = {
+					"fid": window.mydata.position[window.mydata.position.length - 1].id
+				}
+				$.post("/gic", data, function(resp) {
+					window.mydata.pageSize = resp.data.pageSize;
+
+					layui.use(['laypage', 'layer'], function() {
+						var laypage = layui.laypage,
+							layer = layui.layer;
+
+						//总页数大于页码总数
+						laypage.render({
+							elem: 'demo1',
+							limit: resp.data.pageSize,
+							count: resp.data.total ,//数据总数
+							curr: window.mydata.pageNum,
+							jump: function(obj) {
+								window.mydata.pageNum = obj.curr;
+								//刷新当前页数据
+
+								$.post("/gij", getFenyeData(), function(resp) {
+									vue.data = resp;
+									clearComplexSelect();
+								})
+							}
+						});
+					})
+				})
+			}
+			//清除勾选
+			function clearComplexSelect() {
+				for (var i = 0; i < vue.complexSelect.length; i++) {
+					vue.complexSelect[i] = false;
+				}
+				vue.$forceUpdate();
+			}
+			//全选
+			function selectAll() {
+				for (var i = 0; i < vue.complexSelect.length; i++) {
+					vue.complexSelect[i] = true;
+				}
+				vue.$forceUpdate();
+			}
+			//初始化分页数据
+			flushFenye();
+			//vue 初始化图片数据
+			var vue = new Vue({
+				el: "#content1",
+				data: {
+					data: [],
+					isShow: false,
+					isShowInput: false,
+					folderName: "新建文件夹",
+					complexSelect: [false, false, false, false, false, false,
+						false, false, false, false, false, false, false, false, false
+					],
+					showFolderName:[true,true,true,true,true,
+					true,true,true,true,true,true,true,true,true,true],//显示文件夹名称
+					updFolderName:["","","","","","","","","","","","","","",""], //修改文件夹名称--原来的名称
+				},
+				methods: {
+					fclick: function(f) {
+						window.mydata.position.push({
+							"name": f.imgname,
+							"id": f.id,
+							"fid": f.fid
+						})
+
+						//刷新分页
+						flushFenye();
+
+						var that = this;
+						$.post("/gij", {
+							"fid": f.id
+						}, function(resp) {
+							that.data = resp;
+							if (resp.length <= 0) {
+								layer.msg("文件夹为空", {
+									time: 1000
+								})
+							}
+							clearComplexSelect();
+						})
+
+						// this.data = f.content;
+					},
+					iclick: function(index) {
+
+						var fsize = 0; //文件夹数量
+						var data = [];
+						for (var i = 0; i < this.data.length; i++) {
+							var curr = this.data[i];
+							if (curr.isimg == 2) {
+								fsize += 1;
+							} else {
+								data.push({
+									alt: curr.imgname,
+									pid: curr.id,
+									src: "/gi?imgName=" + curr.realname,
+									thumb: "/gsi?imgName=" + curr.realname
+								})
+							}
+						}
+
+						var json = {
+							"title": "", //相册标题
+							"id": 0, //相册id
+							"start": index - fsize, //初始显示的图片序号，默认0
+							"data": data
+						}
+
+						console.log(json)
+
+						layer.photos({
+							photos: json,
+							anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+						});
+					},
+					ins_input_blur: function() {
+						//创建文件夹
+						var fid = window.mydata.position[window.mydata.position.length - 1].id; //获取当前文件夹位置
+						var that = this;
+						var data = {
+							"fid": fid,
+							"fname": that.folderName
+						}
+						$.post("insf", data, function(resp) {
+							console.log(resp)
+							if (resp.code == 200) {
+								//创建文件夹成功--刷新页面
+								$.post("/gij", getFenyeData(), function(resp) {
+									that.data = resp;
+									that.isShow = false;
+									that.isShowInput = false;
+									that.folderName = "新建文件夹";
+									clearComplexSelect();
+								})
+								that.isShowInput = true;
+								layer.msg("创建文件夹成功", {
+									time: 1000
+								})
+							} else if (resp.code == 501) {
+								//文件夹已存在
+								layer.msg('文件夹已存在', {
+									time: 1000
+								})
+							} else {
+								//创建文件夹失败--进行提示
+								layer.msg("创建文件夹失败", {
+									time: 1000
+								})
+								that.isShow = false;
+							}
+						})
+					},
+					div_select_click: function(index, f) {
+						//复选框点击事件
+						this.$set(this.complexSelect, index, !this.complexSelect[index]);
+					},
+					playVideo: function(f) { //播放视频
+
+						//视频播放
+						layer.open({
+							type: 1,
+							title: "",
+							anim: 0,
+							skin: 'layui-layer-rim', //加上边框
+							area: ['860px', '540px'], //宽高
+							content: $('#div_video')
+						});
+						$("#div_video").children().eq(0).attr("src", "/gsi?imgName=" + f.realname)
+						$("#video_a").attr("href", "/downloadFile?filename=" + f.realname)
+
+					},
+					updName: function(f,index, event){
+						//双击文件夹名
+						this.$set(this.showFolderName,index,false);
+						this.$set(this.updFolderName,index,f.imgname);
+						setTimeout(function() {
+							$(event.target).next().focus();
+						}, 100)
+					},
+					upd_input_blur:function(f, index){ //修改文件夹名称
+						var that = this;
+						if(f.isimg==2){ //修改文件夹名
+							$.post("/ufn",{"fname":that.updFolderName[index],"id":f.id},function(resp){
+								console.log(resp)
+								if(resp.code==200){
+									$.post("/gij", getFenyeData(), function(resp) {
+										vue.data = resp;
+									})
+									
+								}else{
+									layer.msg("修改失败,请稍后再试",{time:1000})
+								}
+								
+							})
+						}else{ //修改文件名
+							$.post("/uin",{"fname":that.updFolderName[index],"id":f.id},function(resp){
+								console.log(resp)
+								if(resp.code==200){
+									$.post("/gij", getFenyeData(), function(resp) {
+										vue.data = resp;
+									})
+								}else{
+									layer.msg("修改失败,请稍后再试",{time:1000})
+								}
+								
+							})
+						}
+						this.$set(this.showFolderName,index,true);
+					}
+				}
+			})
+			//获取初始数据
+			$.post("/gij", getFenyeData(), function(resp) {
+				vue.data = resp;
+			})
+
+
+			//新建文件夹
+			$("#insNewFolder").click(function() {
+				//在第一个位置插入文件夹
+				vue.isShow = true;
+				setTimeout(function() {
+					$("#input_insf").focus();
+				}, 100)
+			})
+			//返回上一级
+			$("#backFuFolder").click(function() {
+				//隐藏新建文件夹
+				vue.isShow = false;
+
+				var data = window.mydata.position;
+				if (data.length > 1) {
+					var obj = data.pop()
+					$.post("/gij", getFenyeData(), function(resp) {
+						vue.data = resp;
+					})
+					//刷新分页
+					flushFenye();
+				} else {
+					layer.msg("根目录", {
+						time: 500
+					})
+				}
+
+
+			})
+
+			//右键菜单
+			layui.use(['dropdown', 'util', 'layer'], function() {
+				var dropdown = layui.dropdown,
+					util = layui.util,
+					layer = layui.layer,
+					$ = layui.jquery;
+
+				var inst = dropdown.render({
+					elem: document //也可绑定到 document，从而重置整个右键
+						,
+					trigger: 'contextmenu' //contextmenu
+						,
+					isAllowSpread: false //禁止菜单组展开收缩
+						,
+					style: 'width: 200px' //定义宽度，默认自适应
+						,
+					id: 'test777' //定义唯一索引
+						,
+					data: [{
+						title: '全选',
+						id: 'quanxuan'
+					}, {
+						title: '取消选择',
+						id: 'cancle'
+					}, {
+						type: '-'
+					}, {
+						title: '剪切',
+						id: 'cut'
+					}, {
+						title: '粘贴',
+						id: 'paste'
+					},{
+						type: '-'
+					}, {
+						title: '批量下载',
+						id: 'download'
+					},{
+						type: '-'
+					}, {
+						title: '自动归类',
+						id: 'autoClassify'
+					},
+				/*{
+						title: '人脸归类',
+						id: 'faceClassify'
+					},*/
+					{
+						type: '-'
+					}, {
+						title: '刷新',
+						id: 'reload'
+					}],
+					click: function(obj, othis) {
+						if (obj.id === 'quanxuan') {
+							selectAll();
+						} else if (obj.id === 'cancle') {
+							clearComplexSelect();
+						} else if (obj.id === 'download') {
+							var selects = vue.complexSelect;
+							var data = vue.data;
+							var flag = false; //没有选择
+							var fileList = ""; //文件下载列表
+							var folderList = ""; //文件夹下载列表
+							for (var i = 0; i < selects.length; i++) {
+								if (selects[i]) {
+									flag = true;
+									//被选中
+									if (data[i].isimg == 2) { //下载文件夹
+										folderList += ("fil=" + data[i].id + "&");
+
+									} else { //下载文件
+										fileList += ("fl=" + data[i].realname + "&");
+									}
+								}
+							}
+							if (!flag) {
+								layer.msg("请先选择", {
+									time: 1000
+								})
+							} else {
+								//下载文件 fil 文件夹id数组  fl 文件数组
+								// layer.msg(folderList + fileList)
+								window.open("/dmf?" + folderList + fileList);
+							}
+						} else if (obj.id === 'reload') {
+							$.post("/gij", getFenyeData(), function(resp) {
+								vue.data = resp;
+							})
+						} else if(obj.id === "cut"){ //剪切
+							var selects = vue.complexSelect;
+							var data = vue.data;
+							var flag = true;
+							window.mydata.cut = {folderList:[],fileList:[],total:0,position:0,
+								clearCut:function(){
+									window.mydata.cut.folderList = [];
+									window.mydata.cut.fileList = [];
+									window.mydata.cut.total = 0;
+									window.mydata.cut.position = 0;
+								}};
+							var cut = window.mydata.cut;
+							for (var i = 0; i < selects.length; i++) {
+								if (selects[i]) {
+									flag = false;
+									if(data[i].isimg == 2){ //文件夹
+										cut.folderList.push(data[i].id);
+									}else{//文件
+										cut.fileList.push(data[i].id)
+									}
+									cut.total += 1;
+								}
+							}
+							cut.position = window.mydata.position[window.mydata.position.length-1].id;
+							
+							if(flag){ //清除剪切数据
+								cut.clearCut();
+							}
+						} else if (obj.id === 'paste'){//粘贴
+							var cut = window.mydata.cut;
+							var currPositon = window.mydata.position;
+							var flag = false;
+							for(var i =0;i<currPositon.length;i++){
+								for(var j=0;j<cut.folderList.length;j++){
+									if(currPositon[i].id === cut.folderList[j]){
+										flag = true;
+										break;
+									}
+								}
+							}
+							if(flag){
+								layer.msg("操作不合法");
+							}else{//进行文件移动
+								console.log(cut)
+								if(cut.total>0){
+									$.post("/mv",{
+										folderList:cut.folderList,
+										fileList: cut.fileList,
+										fid:currPositon[currPositon.length-1].id
+										},function(resp){
+											if(resp.code==200){ //进行刷新
+												$.post("/gij", getFenyeData(), function(resp) {
+													vue.data = resp;
+												})
+											}else{
+												layer.msg("移动失败，请稍后再试")
+											}
+										})
+								}
+							}
+							
+							//清除剪切数据
+							cut.clearCut();
+						}else if(obj.id === "autoClassify"){ //自动归类
+							layer.confirm('确定自动归类?', {icon: 3, title:'提示'}, function(index){
+							  //do something
+							  var load_index = layer.load(2,{time:10*1000});
+							  $.post("/ac",{},function(resp){
+								  if(resp.code == 200){
+									  window.location.reload();
+								  }else{
+									 layer.msg("自动归类失败，请稍后再试") 
+								  }
+								  layer.close(load_index)
+							  })
+							  layer.close(index);
+							});
+						}else if(obj.id === "faceClassify"){ //自动归类
+							layer.msg("归类中...")
+						    $.post("/fc")
+						}
+					}
+				});
+			})
+		</script>
+		<script type="text/javascript">
+			//显示当前位置
+			var vue_position = new Vue({
+				el: "#div_position",
+				data: {
+					position: window.mydata.position
+				},
+				methods:{
+					tiaozhuan: function(index){
+						//删除跳转之后的所有元素
+						var g_position = window.mydata.position;
+						for(var i=g_position.length-1;i>index;i--){
+							g_position.pop();
+						}
+						//刷新页面数据
+						$.post("/gij", getFenyeData(), function(resp) {
+							vue.data = resp;
+						})
+					}
+				}
+			})
+		</script>
+		<!-- 矩形选框 -->
+		<script type="text/javascript">
+			$( function() {
+				 //申明全局变量
+				    var timeStart, timeEnd, time;
+					var div = document.createElement("div");
+				    //获取此刻时间
+				    function getTimeNow() {
+				        var now = new Date();
+				        return now.getTime();
+				    }
+				
+				    //鼠标按下时触发
+				    function holdDown(e) {
+				        //获取鼠标按下时的时间
+				        timeStart = getTimeNow();
+				
+				        //setInterval会每100毫秒执行一次，也就是每100毫秒获取一次时间
+				        time = setInterval(function () {
+				            timeEnd = getTimeNow();
+				
+				            //如果此时检测到的时间与第一次获取的时间差有1000毫秒
+				            if (timeEnd - timeStart > 150) {
+				                //便不再继续重复此函数 （clearInterval取消周期性执行）
+				                clearInterval(time);
+								downLong(e);
+				                //字体变红
+				                // document.getElementById("p1").style.color = "red";
+				            }
+				        }, 50);
+				    }
+				    function holdUp() {
+				        //如果按下时间不到1000毫秒便弹起，
+				        clearInterval(time);
+				    }
+				 function getLeft(e){
+				   var offset=e.offsetLeft;
+				   if(e.offsetParent!=null) offset+=getLeft(e.offsetParent);
+				   return offset;
+				 }
+				  function getTop(e){
+				    var offset=e.offsetTop;
+				    if(e.offsetParent!=null) offset+=getTop(e.offsetParent);
+				    return offset;
+				  }
+				  //长按触发
+				  function downLong(e){
+					  var posx = e.clientX;
+					  var posy = e.clientY;
+					  
+					  div.className = "tempDiv";
+					  div.style.left = e.clientX + "px";
+					  div.style.top = e.clientY + "px";
+					  document.body.appendChild(div);
+					  //获取页面上元素的位置
+					  var eles = $(".be_select_ele");
+					  var eles_rect = [];
+					  for(var i=0;i<eles.length;i++){
+					  	var ele = eles[i];
+					  	eles_rect.push({left:getLeft(ele),top:getTop(ele),width:ele.offsetWidth,height:ele.offsetHeight})
+					  }
+					  document.onmouseup = function() {
+					  	console.log("onmouseup")
+					  	div.parentNode.removeChild(div);
+					  	div.style.width = "0px";
+					  	div.style.height = "0px";
+					  	document.onmousemove = null;
+					  	document.onmouseup = null;
+					  }
+					  document.onmousemove = function(ev) {
+					  	var left = Math.min(ev.clientX, posx);
+					  	var top = Math.min(ev.clientY, posy);
+					  	var width = Math.abs(posx - ev.clientX);
+					  	var height = Math.abs(posy - ev.clientY);
+					  	div.style.left = left + "px";
+					  	div.style.top = top + "px";
+					  	div.style.width = width + "px";
+					  	div.style.height = height + "px";
+					  	
+					  	for(var i=0;i<eles_rect.length;i++){
+					  		var ele = eles_rect[i];
+					  		// 第一个矩形：（x1 left,y1 top),(x2 width,y2 height)
+					  		// 第二个矩形：  (x3 ele.left,y3 ele.top),(x4 ele.width,y4 ele.height)
+					  		// max（x1,x3）<=min(x2,x4)&&max(y1,y3)<=min(y2,y4)
+					  		if(Math.max(left,ele.left)<=Math.min(left+width,ele.left+ele.width)
+					  			&&Math.max(top,ele.top)<=Math.min(top+height,ele.top+ele.height)){ //判断是否相交
+					  			vue.$set(vue.complexSelect,i,true);
+					  		}else{
+					  			vue.$set(vue.complexSelect,i,false);
+					  		}
+					  	}
+					  	ev.preventDefault()
+					  	// stateBar.innerHTML = "MouseX: " + ev.clientX + "<br/>MouseY: " + ev.clientY;
+					  }
+					  
+					  e.preventDefault()
+				  }
+				// var stateBar = document.getElementById("bottom");
+				document.onmousedown = function(e) {
+					console.log(e)
+					console.log("onmousedown")
+					holdDown(e);
+					// e.preventDefault();
+					document.onmouseup = function() {
+						holdUp();	 
+					}
+				}
+			})
+		</script>
+		<script src="layui/layui.js" charset="utf-8"></script>
+		
+	</body>
+	
+</html>

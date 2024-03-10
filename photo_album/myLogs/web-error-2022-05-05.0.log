@@ -1,0 +1,1 @@
+2022-05-05 14:40:35.512 [http-nio-80-exec-3] ERROR com.alibaba.druid.pool.DruidDataSource - testWhileIdle is true, validationQuery not set

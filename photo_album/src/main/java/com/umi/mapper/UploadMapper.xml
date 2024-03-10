@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.umi.mapper.UploadMapper">
+  <resultMap id="BaseResultMap" type="com.umi.pojo.Upload">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uid" jdbcType="INTEGER" property="uid" />
+    <result column="fid" jdbcType="INTEGER" property="fid" />
+    <result column="isDel" jdbcType="TINYINT" property="isdel" />
+    <result column="isImg" jdbcType="TINYINT" property="isimg" />
+    <result column="imgName" jdbcType="VARCHAR" property="imgname" />
+    <result column="realName" jdbcType="VARCHAR" property="realname" />
+    <result column="size" jdbcType="BIGINT" property="size" />
+    <result column="uploadTime" jdbcType="TIMESTAMP" property="uploadtime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.umi.pojo.Upload">
+    <result column="tags" jdbcType="LONGVARCHAR" property="tags" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, uid, fid, isDel, isImg, imgName, realName, size, uploadTime
+  </sql>
+  <sql id="Blob_Column_List">
+    tags
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.umi.pojo.UploadExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from upload
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.umi.pojo.UploadExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from upload
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <if test="limit != null">
+      <if test="offset != null">
+        limit ${offset}, ${limit}
+      </if>
+      <if test="offset == null">
+        limit ${limit}
+      </if>
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from upload
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from upload
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.umi.pojo.UploadExample">
+    delete from upload
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.umi.pojo.Upload">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into upload (uid, fid, isDel, 
+      isImg, imgName, realName, 
+      size, uploadTime, tags
+      )
+    values (#{uid,jdbcType=INTEGER}, #{fid,jdbcType=INTEGER}, #{isdel,jdbcType=TINYINT}, 
+      #{isimg,jdbcType=TINYINT}, #{imgname,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, 
+      #{size,jdbcType=BIGINT}, #{uploadtime,jdbcType=TIMESTAMP}, #{tags,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.umi.pojo.Upload">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into upload
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="uid != null">
+        uid,
+      </if>
+      <if test="fid != null">
+        fid,
+      </if>
+      <if test="isdel != null">
+        isDel,
+      </if>
+      <if test="isimg != null">
+        isImg,
+      </if>
+      <if test="imgname != null">
+        imgName,
+      </if>
+      <if test="realname != null">
+        realName,
+      </if>
+      <if test="size != null">
+        size,
+      </if>
+      <if test="uploadtime != null">
+        uploadTime,
+      </if>
+      <if test="tags != null">
+        tags,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="uid != null">
+        #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="fid != null">
+        #{fid,jdbcType=INTEGER},
+      </if>
+      <if test="isdel != null">
+        #{isdel,jdbcType=TINYINT},
+      </if>
+      <if test="isimg != null">
+        #{isimg,jdbcType=TINYINT},
+      </if>
+      <if test="imgname != null">
+        #{imgname,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null">
+        #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        #{size,jdbcType=BIGINT},
+      </if>
+      <if test="uploadtime != null">
+        #{uploadtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tags != null">
+        #{tags,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.umi.pojo.UploadExample" resultType="java.lang.Long">
+    select count(*) from upload
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update upload
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=BIGINT},
+      </if>
+      <if test="record.uid != null">
+        uid = #{record.uid,jdbcType=INTEGER},
+      </if>
+      <if test="record.fid != null">
+        fid = #{record.fid,jdbcType=INTEGER},
+      </if>
+      <if test="record.isdel != null">
+        isDel = #{record.isdel,jdbcType=TINYINT},
+      </if>
+      <if test="record.isimg != null">
+        isImg = #{record.isimg,jdbcType=TINYINT},
+      </if>
+      <if test="record.imgname != null">
+        imgName = #{record.imgname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.realname != null">
+        realName = #{record.realname,jdbcType=VARCHAR},
+      </if>
+      <if test="record.size != null">
+        size = #{record.size,jdbcType=BIGINT},
+      </if>
+      <if test="record.uploadtime != null">
+        uploadTime = #{record.uploadtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.tags != null">
+        tags = #{record.tags,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map">
+    update upload
+    set id = #{record.id,jdbcType=BIGINT},
+      uid = #{record.uid,jdbcType=INTEGER},
+      fid = #{record.fid,jdbcType=INTEGER},
+      isDel = #{record.isdel,jdbcType=TINYINT},
+      isImg = #{record.isimg,jdbcType=TINYINT},
+      imgName = #{record.imgname,jdbcType=VARCHAR},
+      realName = #{record.realname,jdbcType=VARCHAR},
+      size = #{record.size,jdbcType=BIGINT},
+      uploadTime = #{record.uploadtime,jdbcType=TIMESTAMP},
+      tags = #{record.tags,jdbcType=LONGVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update upload
+    set id = #{record.id,jdbcType=BIGINT},
+      uid = #{record.uid,jdbcType=INTEGER},
+      fid = #{record.fid,jdbcType=INTEGER},
+      isDel = #{record.isdel,jdbcType=TINYINT},
+      isImg = #{record.isimg,jdbcType=TINYINT},
+      imgName = #{record.imgname,jdbcType=VARCHAR},
+      realName = #{record.realname,jdbcType=VARCHAR},
+      size = #{record.size,jdbcType=BIGINT},
+      uploadTime = #{record.uploadtime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.umi.pojo.Upload">
+    update upload
+    <set>
+      <if test="uid != null">
+        uid = #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="fid != null">
+        fid = #{fid,jdbcType=INTEGER},
+      </if>
+      <if test="isdel != null">
+        isDel = #{isdel,jdbcType=TINYINT},
+      </if>
+      <if test="isimg != null">
+        isImg = #{isimg,jdbcType=TINYINT},
+      </if>
+      <if test="imgname != null">
+        imgName = #{imgname,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null">
+        realName = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="size != null">
+        size = #{size,jdbcType=BIGINT},
+      </if>
+      <if test="uploadtime != null">
+        uploadTime = #{uploadtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tags != null">
+        tags = #{tags,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.umi.pojo.Upload">
+    update upload
+    set uid = #{uid,jdbcType=INTEGER},
+      fid = #{fid,jdbcType=INTEGER},
+      isDel = #{isdel,jdbcType=TINYINT},
+      isImg = #{isimg,jdbcType=TINYINT},
+      imgName = #{imgname,jdbcType=VARCHAR},
+      realName = #{realname,jdbcType=VARCHAR},
+      size = #{size,jdbcType=BIGINT},
+      uploadTime = #{uploadtime,jdbcType=TIMESTAMP},
+      tags = #{tags,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.umi.pojo.Upload">
+    update upload
+    set uid = #{uid,jdbcType=INTEGER},
+      fid = #{fid,jdbcType=INTEGER},
+      isDel = #{isdel,jdbcType=TINYINT},
+      isImg = #{isimg,jdbcType=TINYINT},
+      imgName = #{imgname,jdbcType=VARCHAR},
+      realName = #{realname,jdbcType=VARCHAR},
+      size = #{size,jdbcType=BIGINT},
+      uploadTime = #{uploadtime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

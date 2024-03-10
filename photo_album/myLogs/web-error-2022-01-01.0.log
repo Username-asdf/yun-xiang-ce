@@ -1,0 +1,33 @@
+2021-05-27 12:48:09.781 [http-nio-80-exec-8] ERROR com.alibaba.druid.pool.DruidDataSource - testWhileIdle is true, validationQuery not set
+2021-05-27 13:18:39.755 [http-nio-80-exec-1] ERROR com.alibaba.druid.pool.DruidDataSource - testWhileIdle is true, validationQuery not set
+2021-05-27 13:22:35.833 [http-nio-80-exec-4] ERROR com.alibaba.druid.pool.DruidDataSource - testWhileIdle is true, validationQuery not set
+2021-05-27 14:08:40.852 [main] ERROR com.alibaba.druid.pool.DruidDataSource - testWhileIdle is true, validationQuery not set
+2022-01-01 14:44:31.879 [restartedMain] ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 80 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 80 or configure this application to listen on another port.
+
+2022-01-01 14:46:26.999 [restartedMain] ERROR o.s.b.diagnostics.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 80 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 80 or configure this application to listen on another port.
+
+2022-01-01 14:47:55.159 [http-nio-80-exec-2] ERROR com.alibaba.druid.pool.DruidDataSource - testWhileIdle is true, validationQuery not set

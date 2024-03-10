@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Home</title> 
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		
+		<!-- Bootstrap Core CSS -->
+		<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+		<link rel="shortcut icon" href="../resources/favicon.ico" th:href="@{/static/favicon.ico}" />
+		<!-- Custom CSS -->
+		<link href="css/style.css"  rel="stylesheet" type="text/css" />
+		<!-- Graph CSS -->
+		<link href="css/font-awesome.css" rel="stylesheet">
+		<!-- jQuery -->
+		<!-- lined-icons -->
+		<link rel="stylesheet" href="css/icon-font.min.css" type="text/css" />
+		<!--animate-->
+		<!-- <script src="js/wow.min.js"></script> -->
+		<script>
+			
+	</script>
+		<!--//end-animate-->
+		
+		<!---//webfonts--->
+		<!-- Meters graphs -->
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<!-- Placed js at the end of the document so the pages load faster -->
+
+	</head>
+
+	<body class="sticky-header left-side-collapsed">
+		<section>
+			<!-- left side start-->
+			<div class="left-side sticky-left-side">
+
+				<!--logo and iconic logo start-->
+				<div class="logo">
+					<h1><a href="index.html">智慧 <span>云相册</span></a></h1>
+				</div>
+				<div class="logo-icon text-center">
+					<a href="index"><i class="lnr lnr-home"></i> </a>
+				</div>
+
+				<!--logo and iconic logo end-->
+				<div class="left-side-inner">
+
+					<!--sidebar nav start-->
+					<ul id="right_menu" class="nav nav-pills nav-stacked custom-nav">
+						<li class="active"><a target="frame_right" href="showImage"><i class="lnr lnr-menu"></i> <span>相册</span></a></li>
+						
+						<li><a target="frame_right" href="uploadImage"><i class="lnr lnr-upload"></i><span>图片上传</span></a></li>
+						
+						<!-- <li><a target="frame_right" href="index.html"><i class=" lnr lnr-cog"></i><span>设置</span></a></li> -->
+					</ul>
+					<!--sidebar nav end-->
+				</div>
+			</div>
+			<!-- left side end-->
+
+			<!-- main content start-->
+			<div class="main-content" style="min-height: auto;">
+				<!-- header-starts -->
+				<div class="header-section">
+
+					<!--toggle button start-->
+					<a class="toggle-btn  menu-collapsed"><i class="fa fa-bars"></i></a>
+					<!--toggle button end-->
+
+					<!--notification menu start -->
+					<div class="menu-right">
+						<div class="user-panel-top">
+
+							<div class="profile_details">
+								<ul>
+									<li class="dropdown profile_details_drop" >
+										<a href="#" class="dropdown-toggle" style="min-width: 200px;width: auto;" data-toggle="dropdown" aria-expanded="false">
+											<div class="profile_img">
+												<span style="background:url(images/1.jpg) no-repeat center"> </span>
+												<div class="user-name">
+													<p><span style="color: red;font-size: 16px;font-style: normal;display: block;margin: 4px 5px;" th:text="${user!=null?user.username:''}"></span></p>
+												</div>
+												<i style="float: left;" class="lnr lnr-chevron-down"></i>
+												<i style="float: left;" class="lnr lnr-chevron-up"></i>
+												<div class="clearfix"></div>
+											</div>
+										</a>
+										<ul class="dropdown-menu drp-mnu">
+											<li> <a onclick="clearActive()" target="frame_right" href="updatePwd"><i class="fa fa-user"></i>修改密码</a> </li>
+											<li> <a href="logout"><i class="fa fa-sign-out"></i> 退出</a> </li>
+										</ul>
+									</li>
+									<div class="clearfix"> </div>
+								</ul>
+							</div>
+
+							<div class="clearfix"></div>
+						</div>
+					</div>
+					<!--notification menu end -->
+				</div>
+				<!-- //header-ends -->
+				<div id="page-wrapper" style="height: 730px;padding-top: 20px;padding-bottom: 0px;">
+					
+					<iframe id="myiframe" name="frame_right" src="showImage" width="100%" scrolling="auto" style="height: 90%;background-color: #f2f2f2;" frameborder="no" border="0"></iframe>
+
+				</div>
+			</div>
+			<!--footer section start-->
+			<footer>
+				<p>Copyright &copy; 2015.Company name All rights reserved.<a target="_blank" href="http://sc.chinaz.com/moban/">&#x7F51;&#x9875;&#x6A21;&#x677F;</a></p>
+			</footer>
+			<!--footer section end-->
+
+			<!-- main content end-->
+		</section>
+
+		<script src="js/jquery.nicescroll.js"></script>
+		<script src="js/scripts.js"></script>
+		<!-- Bootstrap Core JavaScript -->
+		<script src="js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			function clearActive(){
+				var children = $("#right_menu").children()
+				for(var i =0;i<children.length;i++){
+					children.eq(i).removeClass("active")
+				}
+			}
+			$(function(){
+				// $(window.parent.document).find("#myiframe").load(function(){
+				// 		var main = $(window.parent.document).find("#myiframe");
+				// 		var thisheight = $(document).height()+30;
+				// 		main.height(thisheight);
+				// 	});
+				var children = $("#right_menu").children()
+				children.click(function(){
+					for(var i =0;i<children.length;i++){
+						children.eq(i).removeClass("active")
+					}
+					$(this).addClass("active")
+				})
+				
+				
+			})
+		</script>
+	</body>
+</html>
